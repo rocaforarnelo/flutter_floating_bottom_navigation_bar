@@ -7,7 +7,8 @@ class FloatingNavbar extends StatefulWidget {
   final int Function(int val) onTap;
   final Color backgroundColor, shadowColor;
   final TextStyle labelStyle;
-  final double iconSize, itemPadding, height;
+  final Widget collapseButtonChild;
+  final double iconSize, itemPadding, height, collapseButtonWidth;
   final BorderRadiusGeometry navBarBorderRadius, itemBorderRadius;
   final EdgeInsets padding;
 
@@ -25,6 +26,8 @@ class FloatingNavbar extends StatefulWidget {
     this.shadowColor = Colors.black,
     this.itemPadding = 0,
     this.height = 100,
+    this.collapseButtonWidth = 40,
+    @required this.collapseButtonChild,
   })  : assert(items.length > 1),
         assert(items.length <= 5),
         assert(currentIndex <= items.length),
@@ -36,6 +39,12 @@ class FloatingNavbar extends StatefulWidget {
 
 class _FloatingNavbarState extends State<FloatingNavbar> {
   List<FloatingNavbarItem> get items => widget.items;
+
+  @override
+  void initState() {
+    super.initState();
+    items.add(FloatingNavbarItem(icon: Icons.ac_unit, title: 'Collapse'));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,61 +74,72 @@ class _FloatingNavbarState extends State<FloatingNavbar> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   mainAxisSize: MainAxisSize.max,
                   children: items.map((f) {
-                    return Expanded(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          AnimatedContainer(
-                            height: widget.height,
-                            duration: Duration(milliseconds: 300),
-                            decoration: BoxDecoration(
-                                color: widget.currentIndex == items.indexOf(f)
-                                    ? f.selectedColor
-                                    : widget.backgroundColor,
-                                borderRadius: widget.itemBorderRadius),
-                            child: InkWell(
-                              onTap: () {
-                                this.widget.onTap(items.indexOf(f));
-                              },
-                              borderRadius: widget.itemBorderRadius,
-                              child: Container(
-                                //max-width for each item
-                                //24 is the padding from left and right
-                                width: MediaQuery.of(context).size.width *
-                                        (100 / (items.length * 100)) -
-                                    widget.itemPadding,
-                                padding: EdgeInsets.all(4),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: <Widget>[
-                                    Icon(
-                                      f.icon,
-                                      color: widget.currentIndex ==
-                                              items.indexOf(f)
-                                          ? f.selectedIconColor
-                                          : f.unselectedIconColor,
-                                      size: widget.iconSize,
-                                    ),
-                                    Text(
-                                      '${f.title}',
-                                      style: widget.labelStyle.copyWith(
-                                          color: widget.currentIndex ==
-                                                  items.indexOf(f)
-                                              ? f.selectedLabelColor
-                                              : f.unselectedLabelColor),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
+                    if (items.indexOf(f) == items.length)
+                      return SizedBox.fromSize(
+                        size: Size.fromWidth(widget.collapseButtonWidth),
+                        child: InkWell(
+                          child: widget.collapseButtonChild,
+                        ),
+                      );
+                    else
+                      return _buildExpanded(f, context);
                   }).toList(),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Expanded _buildExpanded(FloatingNavbarItem f, BuildContext context) {
+    return Expanded(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          AnimatedContainer(
+            height: widget.height,
+            duration: Duration(milliseconds: 300),
+            decoration: BoxDecoration(
+                color: widget.currentIndex == items.indexOf(f)
+                    ? f.selectedColor
+                    : widget.backgroundColor,
+                borderRadius: widget.itemBorderRadius),
+            child: InkWell(
+              onTap: () {
+                this.widget.onTap(items.indexOf(f));
+              },
+              borderRadius: widget.itemBorderRadius,
+              child: Container(
+                //max-width for each item
+                //24 is the padding from left and right
+                width: MediaQuery.of(context).size.width *
+                        (100 / (items.length * 100)) -
+                    widget.itemPadding -
+                    widget.collapseButtonWidth,
+                padding: EdgeInsets.all(4),
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Icon(
+                      f.icon,
+                      color: widget.currentIndex == items.indexOf(f)
+                          ? f.selectedIconColor
+                          : f.unselectedIconColor,
+                      size: widget.iconSize,
+                    ),
+                    Text(
+                      '${f.title}',
+                      style: widget.labelStyle.copyWith(
+                          color: widget.currentIndex == items.indexOf(f)
+                              ? f.selectedLabelColor
+                              : f.unselectedLabelColor),
+                    ),
+                  ],
                 ),
               ),
             ),
