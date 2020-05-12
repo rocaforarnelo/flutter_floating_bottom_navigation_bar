@@ -1,30 +1,27 @@
 import 'package:floating_bottom_navigation_bar/src/floating_navbar_item.dart';
 import 'package:flutter/material.dart';
 
-
 class FloatingNavbar extends StatefulWidget {
   final List<FloatingNavbarItem> items;
   final int currentIndex;
   final int Function(int val) onTap;
-  final Color selectedBackgroundColor;
-  final Color selectedItemColor;
-  final Color unselectedItemColor;
   final Color backgroundColor;
-  final double fontSize;
+  final TextStyle labelStyle;
   final double iconSize;
+  final BorderRadiusGeometry navBarBorderRadius;
+  final EdgeInsets padding;
 
-  const FloatingNavbar(
-      {Key key,
-        @required this.items,
-        @required this.currentIndex,
-        @required this.onTap,
-        this.backgroundColor = Colors.black,
-        this.selectedBackgroundColor = Colors.white,
-        this.selectedItemColor = Colors.black,
-        this.iconSize = 24.0,
-        this.fontSize = 11.0,
-        this.unselectedItemColor = Colors.white})
-      : assert(items.length > 1),
+  const FloatingNavbar({
+    Key key,
+    @required this.items,
+    @required this.currentIndex,
+    @required this.onTap,
+    this.backgroundColor = Colors.black,
+    this.iconSize = 24.0,
+    this.padding = const EdgeInsets.all(5),
+    @required this.navBarBorderRadius,
+    @required this.labelStyle,
+  })  : assert(items.length > 1),
         assert(items.length <= 5),
         assert(currentIndex <= items.length),
         super(key: key);
@@ -47,9 +44,9 @@ class _FloatingNavbarState extends State<FloatingNavbar> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             child: Container(
-              padding: EdgeInsets.only(bottom: 8, top: 8),
+              padding: widget.padding,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: widget.navBarBorderRadius,
                 color: widget.backgroundColor,
               ),
               width: double.infinity,
@@ -67,7 +64,10 @@ class _FloatingNavbarState extends State<FloatingNavbar> {
                           AnimatedContainer(
                             duration: Duration(milliseconds: 300),
                             decoration: BoxDecoration(
-                                color: widget.currentIndex == items.indexOf(f) ? widget.selectedBackgroundColor : widget.backgroundColor, borderRadius: BorderRadius.circular(8)),
+                                color: widget.currentIndex == items.indexOf(f)
+                                    ? f.selectedColor
+                                    : widget.backgroundColor,
+                                borderRadius: BorderRadius.circular(8)),
                             child: InkWell(
                               onTap: () {
                                 this.widget.onTap(items.indexOf(f));
@@ -76,7 +76,9 @@ class _FloatingNavbarState extends State<FloatingNavbar> {
                               child: Container(
                                 //max-width for each item
                                 //24 is the padding from left and right
-                                width: MediaQuery.of(context).size.width * (100 / (items.length * 100)) - 24,
+                                width: MediaQuery.of(context).size.width *
+                                        (100 / (items.length * 100)) -
+                                    24,
                                 padding: EdgeInsets.all(4),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.max,
@@ -85,13 +87,19 @@ class _FloatingNavbarState extends State<FloatingNavbar> {
                                   children: <Widget>[
                                     Icon(
                                       f.icon,
-                                      color: widget.currentIndex == items.indexOf(f) ? widget.selectedItemColor : widget.unselectedItemColor,
+                                      color: widget.currentIndex ==
+                                              items.indexOf(f)
+                                          ? f.selectedIconColor
+                                          : f.unselectedIconColor,
                                       size: widget.iconSize,
                                     ),
                                     Text(
                                       '${f.title}',
-                                      style: TextStyle(
-                                          color: widget.currentIndex == items.indexOf(f) ? widget.selectedItemColor : widget.unselectedItemColor, fontSize: widget.fontSize),
+                                      style: widget.labelStyle.copyWith(
+                                          color: widget.currentIndex ==
+                                                  items.indexOf(f)
+                                              ? f.selectedLabelColor
+                                              : f.unselectedLabelColor),
                                     ),
                                   ],
                                 ),
