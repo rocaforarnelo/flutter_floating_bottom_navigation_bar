@@ -74,7 +74,7 @@ class _FloatingNavbarState extends State<FloatingNavbar> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   mainAxisSize: MainAxisSize.max,
                   children: items.map((f) {
-                    if (items.indexOf(f) == items.length)
+                    if (items.indexOf(f) == items.length - 1)
                       return Expanded(
                         child: SizedBox.fromSize(
                           size: Size.fromWidth(widget.collapseButtonWidth),
