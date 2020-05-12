@@ -5,10 +5,10 @@ class FloatingNavbar extends StatefulWidget {
   final List<FloatingNavbarItem> items;
   final int currentIndex;
   final int Function(int val) onTap;
-  final Color backgroundColor;
+  final Color backgroundColor, shadowColor;
   final TextStyle labelStyle;
-  final double iconSize;
-  final BorderRadiusGeometry navBarBorderRadius;
+  final double iconSize, itemPadding, height;
+  final BorderRadiusGeometry navBarBorderRadius, itemBorderRadius;
   final EdgeInsets padding;
 
   const FloatingNavbar({
@@ -21,6 +21,10 @@ class FloatingNavbar extends StatefulWidget {
     this.padding = const EdgeInsets.all(5),
     @required this.navBarBorderRadius,
     @required this.labelStyle,
+    @required this.itemBorderRadius,
+    this.shadowColor = Colors.black,
+    this.itemPadding = 0,
+    this.height = 100,
   })  : assert(items.length > 1),
         assert(items.length <= 5),
         assert(currentIndex <= items.length),
@@ -46,9 +50,14 @@ class _FloatingNavbarState extends State<FloatingNavbar> {
             child: Container(
               padding: widget.padding,
               decoration: BoxDecoration(
-                borderRadius: widget.navBarBorderRadius,
-                color: widget.backgroundColor,
-              ),
+                  borderRadius: widget.navBarBorderRadius,
+                  color: widget.backgroundColor,
+                  boxShadow: [
+                    BoxShadow(
+                        color: widget.shadowColor,
+                        blurRadius: 8,
+                        offset: Offset(0, 0))
+                  ]),
               width: double.infinity,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -62,23 +71,24 @@ class _FloatingNavbarState extends State<FloatingNavbar> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
                           AnimatedContainer(
+                            height: widget.height,
                             duration: Duration(milliseconds: 300),
                             decoration: BoxDecoration(
                                 color: widget.currentIndex == items.indexOf(f)
                                     ? f.selectedColor
                                     : widget.backgroundColor,
-                                borderRadius: BorderRadius.circular(8)),
+                                borderRadius: widget.itemBorderRadius),
                             child: InkWell(
                               onTap: () {
                                 this.widget.onTap(items.indexOf(f));
                               },
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: widget.itemBorderRadius,
                               child: Container(
                                 //max-width for each item
                                 //24 is the padding from left and right
                                 width: MediaQuery.of(context).size.width *
                                         (100 / (items.length * 100)) -
-                                    24,
+                                    widget.itemPadding,
                                 padding: EdgeInsets.all(4),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.max,
