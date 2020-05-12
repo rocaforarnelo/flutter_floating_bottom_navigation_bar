@@ -75,10 +75,12 @@ class _FloatingNavbarState extends State<FloatingNavbar> {
                   mainAxisSize: MainAxisSize.max,
                   children: items.map((f) {
                     if (items.indexOf(f) == items.length)
-                      return SizedBox.fromSize(
-                        size: Size.fromWidth(widget.collapseButtonWidth),
-                        child: InkWell(
-                          child: widget.collapseButtonChild,
+                      return Expanded(
+                        child: SizedBox.fromSize(
+                          size: Size.fromWidth(widget.collapseButtonWidth),
+                          child: InkWell(
+                            child: widget.collapseButtonChild,
+                          ),
                         ),
                       );
                     else
@@ -117,8 +119,7 @@ class _FloatingNavbarState extends State<FloatingNavbar> {
                 //24 is the padding from left and right
                 width: MediaQuery.of(context).size.width *
                         (100 / (items.length * 100)) -
-                    widget.itemPadding -
-                    widget.collapseButtonWidth,
+                    widget.itemPadding,
                 padding: EdgeInsets.all(4),
                 child: Column(
                   mainAxisSize: MainAxisSize.max,
