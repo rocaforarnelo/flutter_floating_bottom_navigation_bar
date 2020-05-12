@@ -75,12 +75,10 @@ class _FloatingNavbarState extends State<FloatingNavbar> {
                   mainAxisSize: MainAxisSize.max,
                   children: items.map((f) {
                     if (items.indexOf(f) == items.length - 1)
-                      return Expanded(
-                        child: SizedBox.fromSize(
-                          size: Size.fromWidth(widget.collapseButtonWidth),
-                          child: InkWell(
-                            child: widget.collapseButtonChild,
-                          ),
+                      return SizedBox.fromSize(
+                        size: Size.fromWidth(widget.collapseButtonWidth),
+                        child: InkWell(
+                          child: widget.collapseButtonChild,
                         ),
                       );
                     else
