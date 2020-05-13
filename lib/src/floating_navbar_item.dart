@@ -18,3 +18,12 @@ class FloatingNavbarItem {
       this.unselectedLabelColor = Colors.white,
       this.selectedLabelColor = Colors.white});
 }
+
+class CollapseNotifier extends ValueNotifier<bool> {
+  CollapseNotifier(bool value) : super(value);
+
+  void toggle() {
+    value = !value;
+    notifyListeners();
+  }
+}

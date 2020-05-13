@@ -8,7 +8,10 @@ class FloatingNavbar extends StatefulWidget {
   final Color backgroundColor, shadowColor;
   final TextStyle labelStyle;
   final Widget collapseButtonChild;
-  final double iconSize, itemPadding, height, collapseButtonWidth;
+  final Widget uncollapseButtonChild;
+  final Size collapseButtonSize;
+  final CollapseNotifier collapseNotifier;
+  final double iconSize, itemPadding, height;
   final BorderRadiusGeometry navBarBorderRadius, itemBorderRadius;
   final EdgeInsets padding;
 
@@ -26,8 +29,10 @@ class FloatingNavbar extends StatefulWidget {
     this.shadowColor = Colors.black,
     this.itemPadding = 0,
     this.height = 100,
-    this.collapseButtonWidth = 40,
     @required this.collapseButtonChild,
+    this.collapseButtonSize = const Size(20, 40),
+    @required this.collapseNotifier,
+    this.uncollapseButtonChild,
   })  : assert(items.length > 1),
         assert(items.length <= 5),
         assert(currentIndex <= items.length),
@@ -37,25 +42,64 @@ class FloatingNavbar extends StatefulWidget {
   _FloatingNavbarState createState() => _FloatingNavbarState();
 }
 
-class _FloatingNavbarState extends State<FloatingNavbar> {
+class _FloatingNavbarState extends State<FloatingNavbar>
+    with SingleTickerProviderStateMixin {
   List<FloatingNavbarItem> get items => widget.items;
-
+  AnimationController _animationController;
+  Animation<double> _scaleAnimation;
+  bool _collapse = false;
   @override
   void initState() {
     super.initState();
+    _animationController = AnimationController(
+        duration: Duration(seconds: 1),
+        vsync: this,
+        lowerBound: 0.0,
+        upperBound: 1.0);
+    _scaleAnimation = CurvedAnimation(
+        parent: _animationController, curve: Curves.fastLinearToSlowEaseIn);
+    _animationController.forward();
+    widget.collapseNotifier.addListener(() {
+      setState(() {
+        if (widget.collapseNotifier.value)
+          _animationController.reverse().then((value) {
+            setState(() {
+              _collapse = true;
+            });
+          });
+        else {
+          setState(() {
+            _collapse = false;
+          });
+          _animationController.forward();
+        }
+      });
+    });
     items.add(FloatingNavbarItem(icon: Icons.ac_unit, title: 'Collapse'));
   }
 
   @override
+  dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return BottomAppBar(
-      color: Colors.transparent,
-      elevation: 0,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+    return _collapse
+        ? SizedBox.fromSize(size: Size(0, 0))
+        : BottomAppBar(
+            color: Colors.transparent, elevation: 0, child: _buildItems());
+  }
+
+  Column _buildItems() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: Align(
+            alignment: Alignment.centerRight,
             child: Container(
               padding: widget.padding,
               decoration: BoxDecoration(
@@ -67,30 +111,42 @@ class _FloatingNavbarState extends State<FloatingNavbar> {
                         blurRadius: 8,
                         offset: Offset(0, 0))
                   ]),
-              width: double.infinity,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  mainAxisSize: MainAxisSize.max,
-                  children: items.map((f) {
-                    if (items.indexOf(f) == items.length - 1)
-                      return SizedBox.fromSize(
-                        size: Size.fromWidth(widget.collapseButtonWidth),
-                        child: InkWell(
-                          child: widget.collapseButtonChild,
-                        ),
-                      );
-                    else
-                      return _buildExpanded(f, context);
-                  }).toList(),
+              child: SizeTransition(
+                axis: Axis.horizontal,
+                axisAlignment: -50,
+                sizeFactor: _scaleAnimation,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisSize: MainAxisSize.max,
+                    children: _buildChildren(),
+                  ),
                 ),
               ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
+  }
+
+  List<Widget> _buildChildren() {
+    List<Widget> children = items.map((f) {
+      if (items.indexOf(f) == items.length - 1)
+        return SizedBox.fromSize(
+          size: widget.collapseButtonSize,
+          child: InkWell(
+            child: widget.collapseButtonChild,
+            onTap: () {
+              widget.collapseNotifier.toggle();
+            },
+          ),
+        );
+      else
+        return _buildExpanded(f, context);
+    }).toList();
+    return children;
   }
 
   Expanded _buildExpanded(FloatingNavbarItem f, BuildContext context) {
@@ -146,5 +202,45 @@ class _FloatingNavbarState extends State<FloatingNavbar> {
         ],
       ),
     );
+  }
+}
+
+class FloatingUncollapseButton extends StatefulWidget {
+  final Widget child;
+  final Color backgrounColor;
+  final CollapseNotifier collapseNotifier;
+
+  const FloatingUncollapseButton(
+      {Key key, this.child, this.collapseNotifier, this.backgrounColor})
+      : super(key: key);
+
+  @override
+  State<StatefulWidget> createState() => _FloatingUncollapseButtonState();
+}
+
+class _FloatingUncollapseButtonState extends State<FloatingUncollapseButton> {
+  @override
+  Widget build(BuildContext context) {
+    return FloatingActionButton(
+        child: widget.child,
+        backgroundColor: widget.backgrounColor,
+        onPressed: () {
+          widget.collapseNotifier.toggle();
+        });
+    // Stack(
+    //   children: <Widget>[
+    //     AnimatedPositioned(
+    //         left: 0,
+    //         right: 0,
+    //         bottom: !widget.collapseNotifier.value ? -100 : 0,
+    //         duration: Duration(seconds: 1),
+    //         child: FloatingActionButton(
+    //             child: widget.child,
+    //             backgroundColor: widget.backgrounColor,
+    //             onPressed: () {
+    //               widget.collapseNotifier.toggle();
+    //             }))
+    //   ],
+    // );
   }
 }
