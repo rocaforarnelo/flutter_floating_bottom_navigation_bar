@@ -44,7 +44,7 @@ class FloatingNavbar extends StatefulWidget {
 
 class _FloatingNavbarState extends State<FloatingNavbar>
     with SingleTickerProviderStateMixin {
-  List<FloatingNavbarItem> get items => widget.items;
+  List<FloatingNavbarItem> _items;
   AnimationController _animationController;
   Animation<double> _scaleAnimation;
   bool _collapse = false;
@@ -66,7 +66,8 @@ class _FloatingNavbarState extends State<FloatingNavbar>
           _animationController.forward();
         });
     });
-    items.add(FloatingNavbarItem(icon: Icons.ac_unit, title: 'Collapse'));
+    _items = widget.items;
+    _items.add(FloatingNavbarItem(icon: Icons.ac_unit, title: 'Collapse'));
   }
 
   @override
@@ -123,8 +124,8 @@ class _FloatingNavbarState extends State<FloatingNavbar>
   }
 
   List<Widget> _buildChildren() {
-    List<Widget> children = items.map((f) {
-      if (items.indexOf(f) == items.length - 1)
+    List<Widget> children = _items.map((f) {
+      if (_items.indexOf(f) == _items.length - 1)
         return SizedBox.fromSize(
           size: widget.collapseButtonSize,
           child: InkWell(
@@ -155,18 +156,18 @@ class _FloatingNavbarState extends State<FloatingNavbar>
             height: widget.height,
             duration: Duration(milliseconds: 300),
             decoration: BoxDecoration(
-                color: widget.currentIndex == items.indexOf(f)
+                color: widget.currentIndex == _items.indexOf(f)
                     ? f.selectedColor
                     : widget.backgroundColor,
                 borderRadius: widget.itemBorderRadius),
             child: InkWell(
               onTap: () {
-                this.widget.onTap(items.indexOf(f));
+                this.widget.onTap(_items.indexOf(f));
               },
               borderRadius: widget.itemBorderRadius,
               child: Container(
                 width: MediaQuery.of(context).size.width *
-                        (100 / (items.length * 100)) -
+                        (100 / (_items.length * 100)) -
                     widget.itemPadding,
                 padding: EdgeInsets.all(4),
                 child: Column(
@@ -176,7 +177,7 @@ class _FloatingNavbarState extends State<FloatingNavbar>
                   children: <Widget>[
                     Icon(
                       f.icon,
-                      color: widget.currentIndex == items.indexOf(f)
+                      color: widget.currentIndex == _items.indexOf(f)
                           ? f.selectedIconColor
                           : f.unselectedIconColor,
                       size: widget.iconSize,
@@ -184,7 +185,7 @@ class _FloatingNavbarState extends State<FloatingNavbar>
                     Text(
                       '${f.title}',
                       style: widget.labelStyle.copyWith(
-                          color: widget.currentIndex == items.indexOf(f)
+                          color: widget.currentIndex == _items.indexOf(f)
                               ? f.selectedLabelColor
                               : f.unselectedLabelColor),
                     ),
