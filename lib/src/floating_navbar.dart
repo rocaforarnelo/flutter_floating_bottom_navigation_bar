@@ -61,10 +61,10 @@ class _FloatingNavbarState extends State<FloatingNavbar>
     _animationController.forward();
     widget.collapseNotifier.addListener(() {
       setState(() {
-        if (widget.collapseNotifier.value)
-          _animationController.reverse().then((value) {
+        if (!widget.collapseNotifier.value)
+          _animationController.forward().then((value) {
             setState(() {
-              _collapse = true;
+              _collapse = false;
             });
           });
       });
@@ -136,7 +136,7 @@ class _FloatingNavbarState extends State<FloatingNavbar>
               setState(() {
                 _collapse = false;
               });
-              _animationController.forward().whenComplete(() {
+              _animationController.reverse().whenComplete(() {
                 widget.collapseNotifier.toggle();
               });
             },
