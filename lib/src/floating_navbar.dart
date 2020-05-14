@@ -65,6 +65,7 @@ class _FloatingNavbarState extends State<FloatingNavbar>
           setState(() {
             _collapse = false;
           });
+        _animationController.forward();
       });
     });
     items.add(FloatingNavbarItem(icon: Icons.ac_unit, title: 'Collapse'));
