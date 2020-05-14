@@ -133,11 +133,11 @@ class _FloatingNavbarState extends State<FloatingNavbar>
           child: InkWell(
             child: widget.collapseButtonChild,
             onTap: () {
-              setState(() {
-                _collapse = false;
-              });
               _animationController.reverse().whenComplete(() {
                 widget.collapseNotifier.toggle();
+                setState(() {
+                  _collapse = true;
+                });
               });
             },
           ),
