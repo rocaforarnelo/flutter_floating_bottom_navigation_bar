@@ -67,12 +67,6 @@ class _FloatingNavbarState extends State<FloatingNavbar>
               _collapse = true;
             });
           });
-        else {
-          setState(() {
-            _collapse = false;
-          });
-          _animationController.forward();
-        }
       });
     });
     items.add(FloatingNavbarItem(icon: Icons.ac_unit, title: 'Collapse'));
@@ -139,7 +133,12 @@ class _FloatingNavbarState extends State<FloatingNavbar>
           child: InkWell(
             child: widget.collapseButtonChild,
             onTap: () {
-              widget.collapseNotifier.toggle();
+              setState(() {
+                _collapse = false;
+              });
+              _animationController.forward().whenComplete(() {
+                widget.collapseNotifier.toggle();
+              });
             },
           ),
         );
@@ -169,8 +168,6 @@ class _FloatingNavbarState extends State<FloatingNavbar>
               },
               borderRadius: widget.itemBorderRadius,
               child: Container(
-                //max-width for each item
-                //24 is the padding from left and right
                 width: MediaQuery.of(context).size.width *
                         (100 / (items.length * 100)) -
                     widget.itemPadding,
