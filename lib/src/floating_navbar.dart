@@ -60,13 +60,11 @@ class _FloatingNavbarState extends State<FloatingNavbar>
         parent: _animationController, curve: Curves.fastLinearToSlowEaseIn);
     _animationController.forward();
     widget.collapseNotifier.addListener(() {
-      setState(() {
-        if (!widget.collapseNotifier.value)
-          setState(() {
-            _collapse = false;
-          });
-        _animationController.forward();
-      });
+      if (!widget.collapseNotifier.value)
+        setState(() {
+          _collapse = false;
+        });
+      _animationController.forward();
     });
     items.add(FloatingNavbarItem(icon: Icons.ac_unit, title: 'Collapse'));
   }
