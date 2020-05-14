@@ -62,10 +62,8 @@ class _FloatingNavbarState extends State<FloatingNavbar>
     widget.collapseNotifier.addListener(() {
       setState(() {
         if (!widget.collapseNotifier.value)
-          _animationController.forward().then((value) {
-            setState(() {
-              _collapse = false;
-            });
+          setState(() {
+            _collapse = false;
           });
       });
     });
