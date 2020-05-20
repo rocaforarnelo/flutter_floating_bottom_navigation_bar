@@ -108,7 +108,7 @@ class _FloatingNavbarState extends State<FloatingNavbar>
                 axisAlignment: -50,
                 sizeFactor: _scaleAnimation,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 2),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     mainAxisSize: MainAxisSize.max,
