@@ -9,7 +9,7 @@ class FloatingNavbar extends StatefulWidget {
   final TextStyle labelStyle;
   final Widget collapseButtonChild;
   final Widget uncollapseButtonChild;
-  final Size collapseButtonSize;
+  final double collapseButtonWidth;
   final CollapseNotifier collapseNotifier;
   final double iconSize, itemPadding, height;
   final BorderRadiusGeometry navBarBorderRadius, itemBorderRadius;
@@ -30,9 +30,9 @@ class FloatingNavbar extends StatefulWidget {
     this.itemPadding = 0,
     this.height = 100,
     @required this.collapseButtonChild,
-    this.collapseButtonSize = const Size(20, 40),
     @required this.collapseNotifier,
     this.uncollapseButtonChild,
+    this.collapseButtonWidth = 30,
   })  : assert(items.length > 1),
         assert(items.length <= 5),
         assert(currentIndex <= items.length),
@@ -126,19 +126,19 @@ class _FloatingNavbarState extends State<FloatingNavbar>
   List<Widget> _buildChildren() {
     List<Widget> children = _items.map((f) {
       if (_items.indexOf(f) == _items.length - 1)
-        return SizedBox.fromSize(
-          size: widget.collapseButtonSize,
-          child: InkWell(
-            child: widget.collapseButtonChild,
-            onTap: () {
-              _animationController.reverse().whenComplete(() {
-                widget.collapseNotifier.toggle();
-                setState(() {
-                  _collapse = true;
-                });
+        return InkWell(
+          child: Container(
+              width: widget.collapseButtonWidth,
+              padding: EdgeInsets.all(4),
+              child: widget.collapseButtonChild),
+          onTap: () {
+            _animationController.reverse().whenComplete(() {
+              widget.collapseNotifier.toggle();
+              setState(() {
+                _collapse = true;
               });
-            },
-          ),
+            });
+          },
         );
       else
         return _buildExpanded(f, context);
@@ -146,55 +146,49 @@ class _FloatingNavbarState extends State<FloatingNavbar>
     return children;
   }
 
-  Expanded _buildExpanded(FloatingNavbarItem f, BuildContext context) {
+  Widget _buildExpanded(FloatingNavbarItem f, BuildContext context) {
     return Expanded(
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          AnimatedContainer(
-            height: widget.height,
-            duration: Duration(milliseconds: 300),
-            decoration: BoxDecoration(
-                color: widget.currentIndex == _items.indexOf(f)
-                    ? f.selectedColor
-                    : widget.backgroundColor,
-                borderRadius: widget.itemBorderRadius),
-            child: InkWell(
-              onTap: () {
-                this.widget.onTap(_items.indexOf(f));
-              },
-              borderRadius: widget.itemBorderRadius,
-              child: Container(
-                width: MediaQuery.of(context).size.width *
-                        (100 / (_items.length * 100)) -
-                    widget.itemPadding,
-                padding: EdgeInsets.all(4),
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Icon(
-                      f.icon,
-                      color: widget.currentIndex == _items.indexOf(f)
-                          ? f.selectedIconColor
-                          : f.unselectedIconColor,
-                      size: widget.iconSize,
-                    ),
-                    Text(
-                      '${f.title}',
-                      style: widget.labelStyle.copyWith(
-                          color: widget.currentIndex == _items.indexOf(f)
-                              ? f.selectedLabelColor
-                              : f.unselectedLabelColor),
-                    ),
-                  ],
+      child: AnimatedContainer(
+        height: widget.height,
+        duration: Duration(milliseconds: 300),
+        decoration: BoxDecoration(
+            color: widget.currentIndex == _items.indexOf(f)
+                ? f.selectedColor
+                : widget.backgroundColor,
+            borderRadius: widget.itemBorderRadius),
+        child: InkWell(
+          onTap: () {
+            this.widget.onTap(_items.indexOf(f));
+          },
+          borderRadius: widget.itemBorderRadius,
+          child: Container(
+            // width: MediaQuery.of(context).size.width *
+            //         (100 / (_items.length * 100)) -
+            //     widget.itemPadding,
+            padding: EdgeInsets.all(4),
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Icon(
+                  f.icon,
+                  color: widget.currentIndex == _items.indexOf(f)
+                      ? f.selectedIconColor
+                      : f.unselectedIconColor,
+                  size: widget.iconSize,
                 ),
-              ),
+                Text(
+                  '${f.title}',
+                  style: widget.labelStyle.copyWith(
+                      color: widget.currentIndex == _items.indexOf(f)
+                          ? f.selectedLabelColor
+                          : f.unselectedLabelColor),
+                ),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
