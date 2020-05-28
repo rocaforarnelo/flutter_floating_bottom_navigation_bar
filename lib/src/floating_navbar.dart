@@ -11,7 +11,7 @@ class FloatingNavbar extends StatefulWidget {
   final int collapseButtonFlex;
   final int buttonFlex;
   final CollapseNotifier collapseNotifier;
-  final double iconSize, itemPadding, height;
+  final double iconSize, itemPadding, height, collapseButtonIconSize;
   final BorderRadiusGeometry navBarBorderRadius, itemBorderRadius;
   final EdgeInsets padding;
 
@@ -33,6 +33,7 @@ class FloatingNavbar extends StatefulWidget {
     @required this.collapseNotifier,
     this.collapseButtonFlex = 1,
     this.buttonFlex = 2,
+    this.collapseButtonIconSize = 24,
   })  : assert(items.length > 1),
         assert(items.length <= 5),
         assert(currentIndex <= items.length),
@@ -170,7 +171,8 @@ class _FloatingNavbarState extends State<FloatingNavbar>
                         size: widget.iconSize,
                       )
                     : SizedBox.fromSize(
-                        size: Size(widget.iconSize, widget.iconSize),
+                        size: Size(widget.collapseButtonIconSize,
+                            widget.collapseButtonIconSize),
                         child: Image.asset(f.iconPath, fit: BoxFit.contain)),
                 Text(
                   '${f.title}',
