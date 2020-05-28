@@ -129,7 +129,7 @@ class _FloatingNavbarState extends State<FloatingNavbar>
         return InkWell(
           child: Container(
               width: widget.collapseButtonWidth,
-              padding: EdgeInsets.all(4),
+              padding: EdgeInsets.all(0),
               child: widget.collapseButtonChild),
           onTap: () {
             _animationController.reverse().whenComplete(() {
