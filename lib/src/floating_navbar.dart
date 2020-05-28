@@ -8,7 +8,8 @@ class FloatingNavbar extends StatefulWidget {
   final Color backgroundColor, shadowColor;
   final TextStyle labelStyle;
   final FloatingNavbarItem collapseButtonChild;
-  final double collapseButtonWidth;
+  final int collapseButtonFlex;
+  final int buttonFlex;
   final CollapseNotifier collapseNotifier;
   final double iconSize, itemPadding, height;
   final BorderRadiusGeometry navBarBorderRadius, itemBorderRadius;
@@ -30,7 +31,8 @@ class FloatingNavbar extends StatefulWidget {
     this.height = 100,
     @required this.collapseButtonChild,
     @required this.collapseNotifier,
-    this.collapseButtonWidth = 30,
+    this.collapseButtonFlex = 1,
+    this.buttonFlex = 2,
   })  : assert(items.length > 1),
         assert(items.length <= 5),
         assert(currentIndex <= items.length),
@@ -133,6 +135,7 @@ class _FloatingNavbarState extends State<FloatingNavbar>
 
   Widget _buildCollapseButton(FloatingNavbarItem f) {
     return Expanded(
+      flex: widget.collapseButtonFlex,
       child: AnimatedContainer(
         height: widget.height,
         duration: Duration(milliseconds: 300),
@@ -186,6 +189,7 @@ class _FloatingNavbarState extends State<FloatingNavbar>
 
   Widget _buildExpanded(FloatingNavbarItem f, BuildContext context) {
     return Expanded(
+      flex: widget.buttonFlex,
       child: AnimatedContainer(
         height: widget.height,
         duration: Duration(milliseconds: 300),
