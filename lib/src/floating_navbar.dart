@@ -7,8 +7,7 @@ class FloatingNavbar extends StatefulWidget {
   final int Function(int val) onTap;
   final Color backgroundColor, shadowColor;
   final TextStyle labelStyle;
-  final Widget collapseButtonChild;
-  final Widget uncollapseButtonChild;
+  final FloatingNavbarItem collapseButtonChild;
   final double collapseButtonWidth;
   final CollapseNotifier collapseNotifier;
   final double iconSize, itemPadding, height;
@@ -31,7 +30,6 @@ class FloatingNavbar extends StatefulWidget {
     this.height = 100,
     @required this.collapseButtonChild,
     @required this.collapseNotifier,
-    this.uncollapseButtonChild,
     this.collapseButtonWidth = 30,
   })  : assert(items.length > 1),
         assert(items.length <= 5),
@@ -126,11 +124,24 @@ class _FloatingNavbarState extends State<FloatingNavbar>
   List<Widget> _buildChildren() {
     List<Widget> children = _items.map((f) {
       if (_items.indexOf(f) == _items.length - 1)
-        return InkWell(
-          child: Container(
-              width: widget.collapseButtonWidth,
-              padding: EdgeInsets.all(0),
-              child: widget.collapseButtonChild),
+        return _buildCollapseButton(widget.collapseButtonChild);
+      else
+        return _buildExpanded(f, context);
+    }).toList();
+    return children;
+  }
+
+  Widget _buildCollapseButton(FloatingNavbarItem f) {
+    return Expanded(
+      child: AnimatedContainer(
+        height: widget.height,
+        duration: Duration(milliseconds: 300),
+        decoration: BoxDecoration(
+            color: widget.currentIndex == _items.indexOf(f)
+                ? f.selectedColor
+                : widget.backgroundColor,
+            borderRadius: widget.itemBorderRadius),
+        child: InkWell(
           onTap: () {
             _animationController.reverse().whenComplete(() {
               widget.collapseNotifier.toggle();
@@ -139,11 +150,34 @@ class _FloatingNavbarState extends State<FloatingNavbar>
               });
             });
           },
-        );
-      else
-        return _buildExpanded(f, context);
-    }).toList();
-    return children;
+          borderRadius: widget.itemBorderRadius,
+          child: Container(
+            padding: EdgeInsets.all(4),
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Icon(
+                  f.icon,
+                  color: widget.currentIndex == _items.indexOf(f)
+                      ? f.selectedIconColor
+                      : f.unselectedIconColor,
+                  size: widget.iconSize,
+                ),
+                Text(
+                  '${f.title}',
+                  style: widget.labelStyle.copyWith(
+                      color: widget.currentIndex == _items.indexOf(f)
+                          ? f.selectedLabelColor
+                          : f.unselectedLabelColor),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildExpanded(FloatingNavbarItem f, BuildContext context) {
@@ -162,9 +196,6 @@ class _FloatingNavbarState extends State<FloatingNavbar>
           },
           borderRadius: widget.itemBorderRadius,
           child: Container(
-            // width: MediaQuery.of(context).size.width *
-            //         (100 / (_items.length * 100)) -
-            //     widget.itemPadding,
             padding: EdgeInsets.all(4),
             child: Column(
               mainAxisSize: MainAxisSize.max,
