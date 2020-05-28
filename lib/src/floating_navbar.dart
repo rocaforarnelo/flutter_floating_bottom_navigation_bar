@@ -158,13 +158,17 @@ class _FloatingNavbarState extends State<FloatingNavbar>
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                Icon(
-                  f.icon,
-                  color: widget.currentIndex == _items.indexOf(f)
-                      ? f.selectedIconColor
-                      : f.unselectedIconColor,
-                  size: widget.iconSize,
-                ),
+                f.icon != null
+                    ? Icon(
+                        f.icon,
+                        color: widget.currentIndex == _items.indexOf(f)
+                            ? f.selectedIconColor
+                            : f.unselectedIconColor,
+                        size: widget.iconSize,
+                      )
+                    : SizedBox.fromSize(
+                        size: Size(widget.iconSize, widget.iconSize),
+                        child: Image.asset(f.iconPath, fit: BoxFit.contain)),
                 Text(
                   '${f.title}',
                   style: widget.labelStyle.copyWith(

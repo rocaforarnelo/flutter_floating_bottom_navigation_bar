@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class FloatingNavbarItem {
   final String title;
   final IconData icon;
+  final String iconPath;
   final Color selectedColor,
       unselectedIconColor,
       selectedIconColor,
@@ -10,8 +11,9 @@ class FloatingNavbarItem {
       selectedLabelColor;
 
   FloatingNavbarItem(
-      {@required this.icon,
+      {this.icon,
       @required this.title,
+      this.iconPath = '',
       this.selectedColor = Colors.blueAccent,
       this.unselectedIconColor = Colors.white,
       this.selectedIconColor = Colors.white,
